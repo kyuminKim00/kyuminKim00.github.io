@@ -386,11 +386,12 @@ button {
 
 #about-details {
   padding-top: 32px;
+  padding-bottom: 40px;
 }
 
 .about-card {
   border-radius: 18px;
-  padding: 18px 18px 20px;
+  padding: 14.5px 18px 18px;
   background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02);
@@ -419,9 +420,13 @@ button {
   font-size: 14px;
   color: #4b5563;
   line-height: 1.6;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   padding-left: 14px;
   position: relative;
+}
+
+.about-list li:last-child {
+  margin-bottom: 0;
 }
 
 .about-list-header {
