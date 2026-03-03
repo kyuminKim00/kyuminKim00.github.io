@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+# 보안을 위해 API Secret이 포함된 스크립트 제외
+sync_cloudinary.py
+upload_to_cloudinary.py
+compress_images.py
+# 필요하다면 원본 데이터 제외 (이미 생성된 json만 배포)
+# data/photos.json은 사이트 동작에 필요하므로 제외하지 않습니다.

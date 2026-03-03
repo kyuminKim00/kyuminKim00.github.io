@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kyumin Kim Portfolio</title>
+  <meta name="description" content="Kyumin Kim Portfolio" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+</head>
+
+<body>
+  <header class="site-header">
+    <div class="site-header-inner container">
+      <a href="index.html" class="logo">
+        <span class="logo-mark"></span>
+        <span class="logo-text">Portfolio</span>
+      </a>
+      <nav class="nav">
+        <button class="nav-toggle" aria-label="메뉴 열기">
+          <span></span><span></span>
+        </button>
+        <ul class="nav-list">
+          <li>
+            <a href="index.html">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              About
+            </a>
+          </li>
+          <li>
+            <a href="work.html">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
+                <rect width="20" height="14" x="2" y="7" rx="2" ry="2" />
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 0 0 0-2 2v16" />
+              </svg>
+              Work
+            </a>
+          </li>
+          <li>
+            <a href="photo.html">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                <circle cx="9" cy="9" r="2" />
+                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+              </svg>
+              Photo
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero / Intro (Profile) -->
+    <section id="hero" class="section hero">
+      <div class="container hero-grid">
+        <div class="hero-text">
+          <p class="hero-kicker">Computer Graphics · 3D Vision · AI</p>
+          <h1 class="hero-title">
+            Kyumin Kim<br />
+            <span>M.S Student &amp; Amateur photographer</span>
+          </h1>
+          <p class="hero-subtitle">
+            Hi, I'm a M.S student at Yonsei University advised by <a href="https://cga.yonsei.ac.kr/people/iklee"
+              target="_blank" rel="noreferrer">Prof. In-Kwon Lee</a>.<br>
+            My previous reseach focused on 3D reconstruction (3DGS, NeRF).<br>
+            Currently, I'm interested in optimal view selection in 3DGS.<br>
+            I'm also an amateur photographer and enjoy taking pictures of landscapes.<br>
+          </p>
+          <div class="hero-actions">
+            <a href="work.html" class="btn primary">Work</a>
+            <a href="photo.html" class="btn ghost">Photo Gallery</a>
+          </div>
+          <div class="hero-meta">
+            <span>📍 Seoul, Korea</span>
+            <span>✉️ kkm8121@yonsei.ac.kr</span>
+          </div>
+          <div class="hero-links">
+            <a href="https://github.com/kyuminKim00" target="_blank" rel="noreferrer">GitHub</a>
+            <span>·</span>
+            <a href="https://scholar.google.com/citations?user=qNl4PXwAAAAJ&hl=ko" target="_blank"
+              rel="noreferrer">Google Scholar</a>
+            <span>·</span>
+            <a href="https://www.linkedin.com/in/kyumin-kim-b84576323" target="_blank" rel="noreferrer">LinkedIn</a>
+            <span>·</span>
+            <a href="https://cga.yonsei.ac.kr/" target="_blank" rel="noreferrer">CGnA</a>
+          </div>
+        </div>
+        <div class="hero-profile">
+          <div class="profile-card">
+            <div class="profile-avatar">
+              <!-- 프로필 사진을 사용한다면 이 부분의 background-image를 styles.css에서 교체 -->
+            </div>
+            <div class="profile-body">
+              <h2>Kyumin Kim</h2>
+              <p class="profile-role">M.S Student · AI Researcher</p>
+              <dl class="profile-info">
+                <div>
+                  <dt>Reseach Interest</dt>
+                  <dd>3D reconstruction, Optimal view selection, Camera pose optimization</dd>
+                </div>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- About (Detailed Info) -->
+    <section id="about-details" class="section section-alt">
+      <div class="container about-rows">
+        <article class="about-card">
+          <h3>Education</h3>
+          <ul class="about-list">
+            <li>
+              <div class="about-list-header">
+                <strong>Yonsei University</strong>
+                <span class="about-duration">2025.03 - Present</span>
+              </div>
+              <div class="about-list-body">
+                M.S. in Intelligence Convergence<br>GPA: 4.13/4.3
+              </div>
+            </li>
+            <li>
+              <div class="about-list-header">
+                <strong>Inha University</strong>
+                <span class="about-duration">2019.03 - 2025.02</span>
+              </div>
+              <div class="about-list-body">
+                B.S. in Information &amp; Communication Engineering<br>GPA: 4.21/4.5, Major GPA: 4.38/4.5
+              </div>
+            </li>
+          </ul>
+        </article>
+        <article class="about-card">
+          <h3>Certifications &amp; Others</h3>
+          <ul class="about-list">
+            <li>Engineer of Bigdata Analysis </li>
+            <li>Engineer of Information Processing</li>
+            <li>Academic Scholarship (Ranked 1st for 3 Semesters: 23-1, 24-1, 24-2)</li>
+          </ul>
+        </article>
+        <article class="about-card">
+          <h3>Tech Stack</h3>
+          <ul class="about-list">
+            <li><strong>Languages:</strong> Python, C++</li>
+            <li><strong>Deep Learning:</strong> PyTorch, NeRF, 3DGS</li>
+            <li><strong>Tools &amp; Others:</strong> Git, Docker, OpenGL, Three.js, Lightroom, Photoshop, Blender</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>© <span id="footer-year"></span> Kyumin Kim</span>
+      <span class="footer-note">Built for GitHub Pages · Cloudinary Photo Gallery</span>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+
+</html>

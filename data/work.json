@@ -1,0 +1,74 @@
+[
+  {
+    "type": "publication",
+    "venue": "Eurographics 2026",
+    "title": "RotGS: Rotation-Guided 3D Gaussian Splatting for Turntable Sequences without Structure-from-Motion",
+    "authors": "Kyumin Kim, Dohae Lee, Hanul Baek, In-Kwon Lee",
+    "year": "2026",
+    "link": "https://github.com/kyuminKim00/RotGS",
+    "thumbnail": "data/rotgs_teaser.png",
+    "tags": [
+      "3D Reconstruction",
+      "3DGS",
+      "Computer Graphics",
+      "Computer Vision"
+    ]
+  },
+  {
+    "type": "publication",
+    "venue": "KCGS 2025",
+    "title": "회전 원판을 활용한 고정 카메라 기반 SfM-free Gaussian Splatting 학습 방법",
+    "authors": "Kyumin Kim, Dohae Lee, Hanul Baek, In-Kwon Lee",
+    "year": "2025",
+    "link": "https://example.com/publication-2",
+    "thumbnail": "data/rot_teaser.png",
+    "tags": [
+      "3D Reconstruction",
+      "3DGS",
+      "Computer Graphics",
+      "Computer Vision"
+    ]
+  },
+  {
+    "type": "publication",
+    "venue": "KCGS 2024",
+    "title": "깊이 감독 Dynamic NeRF: 제한된 카메라를 이용한 동적 장면 재구성",
+    "authors": "Kyumin Kim, Dong Ha Park, Chae Eun Rhee",
+    "year": "2024",
+    "link": "https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE11866031",
+    "thumbnail": "data/4D_teaser.png",
+    "tags": [
+      "3D Reconstruction",
+      "NeRF",
+      "Computer Graphics",
+      "Computer Vision"
+    ]
+  },
+  {
+    "type": "patent",
+    "title": "가우시안 스플래팅 기반 3차원 구조 추정 장치 및 방법",
+    "authors": "Kyumin Kim, et al.",
+    "year": "2025",
+    "link": "https://github.com/your-github/your-portfolio",
+    "thumbnail": "data/patent_teaser.png",
+    "tags": [
+      "3D Reconstruction",
+      "3DGS",
+      "Structure-from-Motion",
+      "Computer Graphics",
+      "Computer Vision"
+    ]
+  },
+  {
+    "type": "project",
+    "title": "Drone Pose Optimization with Multi-Camera & UWB",
+    "year": "2024",
+    "link": "data/poster_apd.pdf",
+    "thumbnail": "data/apd_teaser.png",
+    "tags": [
+      "Camera pose optimization",
+      "Drone",
+      "Robotics"
+    ]
+  }
+]
