@@ -762,7 +762,8 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 400px;
+  min-height: 200px;
+  /* Reduced from 400px for better fit */
   background: #ffffff;
   border-radius: 20px 20px 0 0;
   flex-grow: 1;
@@ -1019,6 +1020,25 @@ button {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
     /* Slightly smaller gap for 2 columns */
+  }
+
+  /* Modal Mobile Refinement */
+  .photo-modal-dialog {
+    width: 95vw;
+    max-height: 95vh;
+  }
+
+  .photo-modal-image-wrapper {
+    padding: 10px 10px 0;
+    min-height: auto;
+  }
+
+  .photo-modal-info {
+    padding: 8px 12px 12px;
+  }
+
+  .photo-modal-image-wrapper img {
+    max-height: 70vh;
   }
 
   .footer-inner {
