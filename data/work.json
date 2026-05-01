@@ -16,6 +16,20 @@
   },
   {
     "type": "publication",
+    "venue": "IEEE Transactions on Visualization and Computer Graphics(TVCG)",
+    "title": "3D Gaussian Splatting Texture Editing via Single Modified Image",
+    "authors": "Hanul Baek, , Dohae Lee, Kyumin Kim, In-Kwon Lee",
+    "year": "2026",
+    "link": ".",
+    "thumbnail": "data/singe_teaser.png",
+    "tags": [
+      "3D Gaussian Splatting",
+      "3DGS editing",
+      "Computer Graphics"
+    ]
+  },
+  {
+    "type": "publication",
     "venue": "KCGS 2025",
     "title": "회전 원판을 활용한 고정 카메라 기반 SfM-free Gaussian Splatting 학습 방법",
     "authors": "Kyumin Kim, Dohae Lee, Hanul Baek, In-Kwon Lee",
