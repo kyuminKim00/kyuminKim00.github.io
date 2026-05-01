@@ -75,6 +75,7 @@
   {
     "type": "project",
     "title": "Drone Pose Optimization with Multi-Camera & UWB",
+    "authors": "Kyumin Kim, et al.",
     "year": "2024",
     "link": "data/poster_apd.pdf",
     "thumbnail": "data/apd_teaser.png",
