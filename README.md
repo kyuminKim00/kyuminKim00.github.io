@@ -15,6 +15,7 @@ This is a lightweight, responsive static portfolio template designed for researc
 - `styles.css`: Custom modern styling and responsive layout.
 - `main.js`: Handles data fetching, UI filtering, and modal interactions.
 - `data/`: JSON files for easy content management.
+- `tools/photos/`: Photo management scripts and local-only upload configs.
 
 ## Setup & Customization
 
@@ -30,11 +31,37 @@ You can update your data without touching the HTML structure by editing the JSON
 - **Work Data**: Edit `data/work.json`. Supports types: `publication`, `patent`, and `project`.
 - **Photo Data**: Edit `data/photos.json`. Update image URLs and metadata (location, camera, tags).
 
-### 3. Image Integration
-The photo gallery is designed to work with **Cloudinary**. 
-1. Upload your images to Cloudinary.
-2. Copy the URLs into `data/photos.json`.
-3. Use Cloudinary's transformation parameters in the `url` field for optimized thumbnails.
+### 3. Photo Upload & Sync
+The photo gallery uses **Cloudinary** URLs stored in `data/photos.json`.
+
+One-time setup:
+1. Fill in `tools/photos/cloudinary_config.py`: `cloud_name`, `api_key`, and `api_secret` from the Cloudinary dashboard.
+2. Set `tools/photos/upload_config.json`: `upload_folder`, `city`, `country`, and `tags` for the photo batch you want to upload.
+
+Update workflow:
+1. Put the photos for one location/batch in the folder listed in `upload_config.json`.
+2. Optional: compress large files before upload.
+   ```powershell
+   python .\tools\photos\compress_images.py .\tools\photos\upload_config.json
+   ```
+3. Upload the batch to Cloudinary with shared city/country/tag metadata.
+   ```powershell
+   python .\tools\photos\upload_to_cloudinary.py .\tools\photos\upload_config.json
+   ```
+4. Regenerate `data/photos.json` from Cloudinary.
+   ```powershell
+   python .\tools\photos\sync_cloudinary.py
+   ```
+5. Check the gallery locally.
+   ```powershell
+   npx serve .
+   ```
+
+Notes:
+- `shotAt` and `camera` are read from EXIF when available.
+- `location` is saved as `city, country` from the upload config.
+- `city` and `country` are also added as Cloudinary tags, along with the tags in the config.
+- `tools/photos/cloudinary_config.py` and `tools/photos/upload_config.json` are ignored by Git because they contain local paths or secrets.
 
 ## Deployment
 This template is ready for **GitHub Pages**.
