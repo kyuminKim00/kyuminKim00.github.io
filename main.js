@@ -131,11 +131,59 @@ const photoModalEl = $("#photo-modal");
 const photoModalImg = $("#photo-modal-image");
 const photoModalTitle = $("#photo-modal-title");
 const photoModalMeta = $("#photo-modal-meta");
+const photoMapButton = $("#photo-map-button");
+const photoMapModalEl = $("#photo-map-modal");
+const photoMapEl = $("#photo-map");
+const photoMapSummaryEl = $("#photo-map-summary");
 
 let allPhotos = [];
 let currentFilteredPhotos = [];
 let currentPhotoIndex = -1;
 let currentPhotoTag = null;
+let pendingMapFocusLocation = null;
+let selectedMapLocation = null;
+
+const photoLocationCoordinates = {
+  "Bohol, Philippines": [9.8499, 124.1435],
+  "Boracay, Pilipinas": [11.9674, 121.9248],
+  "Busan, Korea": [35.1796, 129.0756],
+  "China, Qingdao": [36.0671, 120.3826],
+  "Chuncheon, Korea": [37.8813, 127.7298],
+  "Gangneung, Korea": [37.7519, 128.8761],
+  "Germany, Aachen": [50.7753, 6.0839],
+  "Germany, Cologne": [50.9375, 6.9603],
+  "Germany, Frankfurt": [50.1109, 8.6821],
+  "Germany, Mainz": [49.9929, 8.2473],
+  "Hokkaido, Japan": [43.0642, 141.3469],
+  "Hualien, Taiwan": [23.9872, 121.6015],
+  "Incheon, Korea": [37.4563, 126.7052],
+  "Jeju, Korea": [33.4996, 126.5312],
+  "Kitakyushu, Japan": [33.8834, 130.8751],
+  "LA, USA": [34.0522, -118.2437],
+  "Las Vegas, USA": [36.1716, -115.1391],
+  "San Francisco, USA": [37.7749, -122.4194],
+  "Seoul, Korea": [37.5665, 126.9780],
+};
+
+const photoLocationColors = {
+  Korea: "#ef4444",
+  Japan: "#f97316",
+  China: "#eab308",
+  Taiwan: "#22c55e",
+  Germany: "#2563eb",
+  Philippines: "#8b5cf6",
+  Pilipinas: "#8b5cf6",
+  USA: "#ec4899",
+};
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 
 async function loadPhotoData() {
   try {
@@ -292,6 +340,160 @@ function closePhotoModal() {
   currentPhotoIndex = -1;
 }
 
+function getPhotoLocationGroups() {
+  return allPhotos.reduce((groups, photo) => {
+    const location = photo.location;
+    const coords = photoLocationCoordinates[location];
+    if (!location || !coords) return groups;
+
+    if (!groups.has(location)) {
+      groups.set(location, {
+        location,
+        coords,
+        color: getLocationColor(location),
+        count: 0,
+        latestShotAt: "",
+      });
+    }
+
+    const group = groups.get(location);
+    group.count += 1;
+    if ((photo.shotAt || "") > group.latestShotAt) {
+      group.latestShotAt = photo.shotAt || "";
+    }
+    return groups;
+  }, new Map());
+}
+
+function getLocationColor(location) {
+  const matchedKey = Object.keys(photoLocationColors).find((key) =>
+    location.includes(key)
+  );
+  return photoLocationColors[matchedKey] || "#111827";
+}
+
+function projectMapPoint(coords) {
+  const [lat, lng] = coords;
+  return {
+    x: ((lng + 180) / 360) * 1000,
+    y: ((90 - lat) / 180) * 500,
+  };
+}
+
+function openPhotoMap(focusLocation = null) {
+  if (!photoMapModalEl || !photoMapEl) return;
+
+  pendingMapFocusLocation = focusLocation;
+  selectedMapLocation = focusLocation;
+  photoMapModalEl.classList.add("is-open");
+  photoMapModalEl.setAttribute("aria-hidden", "false");
+
+  renderPhotoMap();
+}
+
+function renderPhotoMap() {
+  if (!photoMapEl) return;
+
+  const groups = Array.from(getPhotoLocationGroups().values());
+  if (photoMapSummaryEl) {
+    const totalPhotos = groups.reduce((sum, group) => sum + group.count, 0);
+    photoMapSummaryEl.textContent = `${groups.length} cities · ${totalPhotos} photos`;
+  }
+
+  const selectedGroup =
+    groups.find((group) => group.location === selectedMapLocation) ||
+    groups.find((group) => group.location === pendingMapFocusLocation) ||
+    groups[0];
+
+  const markerButtons = groups
+    .map((group) => {
+      const point = projectMapPoint(group.coords);
+      const isSelected = group.location === selectedGroup?.location;
+      return `
+        <button
+          class="photo-map-marker ${isSelected ? "is-selected" : ""}"
+          type="button"
+          style="left:${point.x / 10}%;top:${point.y / 5}%;--marker-color:${group.color};"
+          data-location="${escapeHtml(group.location)}"
+          aria-label="${escapeHtml(group.location)}: ${group.count} photos"
+        >
+          <span class="photo-map-marker-dot"></span>
+          <span class="photo-map-marker-label">${escapeHtml(group.location.split(",")[0])}</span>
+        </button>
+      `;
+    })
+    .join("");
+
+  const cityList = groups
+    .sort((a, b) => b.count - a.count || a.location.localeCompare(b.location))
+    .map((group) => `
+      <button
+        class="photo-map-city ${group.location === selectedGroup?.location ? "is-selected" : ""}"
+        type="button"
+        data-location="${escapeHtml(group.location)}"
+      >
+        <span class="photo-map-city-swatch" style="background:${group.color};"></span>
+        <span class="photo-map-city-name">${escapeHtml(group.location)}</span>
+        <span class="photo-map-city-count">${group.count}</span>
+      </button>
+    `)
+    .join("");
+
+  photoMapEl.innerHTML = `
+    <div class="photo-map-visual" aria-label="World photo map">
+      <svg class="photo-world-map-fallback" viewBox="0 0 1000 500" aria-hidden="true">
+        <path class="photo-map-fallback-land" d="M77 166L112 124L166 102L228 95L285 112L330 149L351 197L332 235L284 238L252 272L218 263L184 292L137 276L116 235L79 218L55 187Z"></path>
+        <path class="photo-map-fallback-land" d="M249 278L287 293L316 342L304 392L279 447L246 487L222 430L205 371L219 318Z"></path>
+        <path class="photo-map-fallback-land" d="M398 145L446 107L506 94L570 105L636 90L705 105L781 130L858 173L894 219L865 257L804 245L752 264L703 248L652 279L598 264L559 286L510 257L458 275L410 238L375 194Z"></path>
+        <path class="photo-map-fallback-land" d="M492 272L538 286L577 326L590 378L569 430L533 465L501 423L476 365L462 311Z"></path>
+        <path class="photo-map-fallback-land" d="M760 315L815 292L872 308L922 354L900 398L844 417L790 391Z"></path>
+        <path class="photo-map-fallback-land" d="M427 94L470 65L516 76L526 116L485 139L445 123Z"></path>
+        <path class="photo-map-fallback-land" d="M0 460L102 448L213 462L335 453L455 466L567 452L692 463L816 449L1000 464V500H0Z"></path>
+        <path class="photo-map-fallback-island" d="M802 211L814 202L824 214L816 228Z"></path>
+        <path class="photo-map-fallback-island" d="M835 232L846 242L838 257L824 247Z"></path>
+        <path class="photo-map-fallback-island" d="M454 150L468 144L475 160L461 168Z"></path>
+      </svg>
+      <img
+        class="photo-world-map"
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/BlankMap-Equirectangular.svg/1280px-BlankMap-Equirectangular.svg.png"
+        alt=""
+        aria-hidden="true"
+        onload="this.previousElementSibling.style.display='none';"
+        onerror="this.style.display='none';"
+      />
+      ${markerButtons}
+    </div>
+    <aside class="photo-map-panel">
+      <div class="photo-map-selected">
+        <span class="photo-map-selected-swatch" style="background:${selectedGroup?.color || "#111827"};"></span>
+        <div>
+          <strong>${escapeHtml(selectedGroup?.location || "No location")}</strong>
+          <span>${selectedGroup ? `${selectedGroup.count} photos · latest ${selectedGroup.latestShotAt}` : ""}</span>
+        </div>
+      </div>
+      <div class="photo-map-cities">
+        ${cityList}
+      </div>
+    </aside>
+  `;
+
+  $$(".photo-map-marker, .photo-map-city").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      selectedMapLocation = btn.dataset.location;
+      pendingMapFocusLocation = btn.dataset.location;
+      renderPhotoMap();
+    });
+  });
+}
+
+function closePhotoMap() {
+  if (!photoMapModalEl) return;
+  photoMapModalEl.classList.remove("is-open");
+  photoMapModalEl.setAttribute("aria-hidden", "true");
+  pendingMapFocusLocation = null;
+  selectedMapLocation = null;
+}
+
 if (photoModalEl) {
   photoModalEl.addEventListener("click", (e) => {
     const target = e.target;
@@ -316,6 +518,26 @@ if (photoModalEl) {
       navigatePhoto(-1);
     } else if (e.key === "ArrowRight") {
       navigatePhoto(1);
+    }
+  });
+}
+
+if (photoMapButton) {
+  photoMapButton.addEventListener("click", () => openPhotoMap());
+}
+
+if (photoMapModalEl) {
+  photoMapModalEl.addEventListener("click", (e) => {
+    const target = e.target;
+    if (target.matches("[data-close-map]")) {
+      closePhotoMap();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (!photoMapModalEl.classList.contains("is-open")) return;
+    if (e.key === "Escape") {
+      closePhotoMap();
     }
   });
 }

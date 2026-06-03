@@ -74,6 +74,9 @@
                         Click the thumbnail to view the high-resolution image.
                     </p>
                 </div>
+                <button id="photo-map-button" class="btn ghost photo-map-open" type="button">
+                    Map
+                </button>
             </div>
             <div class="container">
                 <div id="photo-grid" class="photo-grid">
@@ -108,6 +111,23 @@
             <div class="photo-modal-info">
                 <p id="photo-modal-meta"></p>
             </div>
+        </div>
+    </div>
+
+    <!-- Photo Map Modal -->
+    <div id="photo-map-modal" class="photo-map-modal" aria-hidden="true">
+        <div class="photo-map-backdrop" data-close-map></div>
+        <div class="photo-map-dialog" role="dialog" aria-modal="true" aria-label="Photo map">
+            <button class="photo-modal-close" type="button" aria-label="지도 닫기" data-close-map>
+                ✕
+            </button>
+            <div class="photo-map-header">
+                <div>
+                    <h3>Photo Map</h3>
+                    <p id="photo-map-summary"></p>
+                </div>
+            </div>
+            <div id="photo-map" class="photo-map"></div>
         </div>
     </div>
 
