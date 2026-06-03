@@ -573,7 +573,7 @@ button {
 
 .work-title {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 400;
   margin: 0;
   color: #111827;
   text-align: left;
@@ -584,23 +584,25 @@ button {
 
 .work-venue {
   font-size: 15px;
-  font-weight: 600;
-  color: #374151;
+  font-weight: 400;
+  color: #111827;
   margin-top: 0;
   font-style: italic;
 }
 
 .work-authors {
   font-size: 15px;
-  color: #374151;
+  color: #6b7280;
   margin-top: 0;
   margin-bottom: 0;
   line-height: 1.45;
 }
 
 .work-authors strong {
-  color: #111827;
-  font-weight: 600;
+  color: inherit;
+  font-weight: 400;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .work-summary {
