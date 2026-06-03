@@ -46,18 +46,14 @@ async function loadWorkData() {
 }
 
 let currentType = "all";
-let currentTag = null;
 
 function renderWorkCards() {
   if (!workListEl) return;
 
-  // 필터링 로직: 타입과 태그를 모두 고려
+  // 필터링 로직: 타입 기준
   let items = allWorks;
   if (currentType !== "all") {
     items = items.filter((item) => item.type === currentType);
-  }
-  if (currentTag) {
-    items = items.filter((item) => item.tags && item.tags.includes(currentTag));
   }
 
   if (!items.length) {
@@ -66,62 +62,56 @@ function renderWorkCards() {
     return;
   }
 
-  workListEl.innerHTML = items
-    .map((item) => {
-      const typeLabel =
-        item.type === "publication"
-          ? "Publication"
-          : item.type === "patent"
-            ? "Patent"
-            : "Project";
-      const year = item.year || "";
-      const tags =
-        Array.isArray(item.tags) && item.tags.length
-          ? `<div class="work-tags">${item.tags
-            .map((t) => `<button class="tag ${t === currentTag ? "active" : ""}" data-tag="${t}">${t}</button>`)
-            .join("")}</div>`
-          : "";
+  const groupedByYear = items.reduce((groups, item) => {
+    const year = item.year || "Other";
+    if (!groups.has(year)) groups.set(year, []);
+    groups.get(year).push(item);
+    return groups;
+  }, new Map());
 
-      const thumbnailPart = item.thumbnail
-        ? `<div class="work-thumbnail">${item.link ? `<a href="${item.link}" target="_blank" rel="noreferrer"><img src="${item.thumbnail}" alt="${item.title}" loading="lazy"></a>` : `<img src="${item.thumbnail}" alt="${item.title}" loading="lazy">`}</div>`
-        : "";
+  workListEl.innerHTML = Array.from(groupedByYear.entries())
+    .map(([year, groupItems]) => {
+      const works = groupItems
+        .map((item) => {
+          const thumbnailImage = item.thumbnail
+            ? `<img src="${item.thumbnail}" alt="${item.title}" loading="lazy">`
+            : "";
+          const thumbnailPart = thumbnailImage
+            ? `<div class="work-thumbnail">${item.link ? `<a href="${item.link}" target="_blank" rel="noreferrer">${thumbnailImage}</a>` : thumbnailImage}</div>`
+            : "";
 
-      const authorsPart = item.authors
-        ? `<div class="work-authors">${item.authors.replace("Kyumin Kim", "<strong>Kyumin Kim</strong>")}</div>`
-        : "";
+          const authorsPart = item.authors
+            ? `<div class="work-authors">${item.authors.replace("Kyumin Kim", "<strong>Kyumin Kim</strong>")}</div>`
+            : "";
 
-      const venuePart = item.venue
-        ? `<div class="work-venue">${item.venue}</div>`
-        : "";
+          const venuePart = item.venue
+            ? `<div class="work-venue">${item.venue}</div>`
+            : "";
+
+          return `
+            <article class="work-card">
+              ${thumbnailPart}
+              <div class="work-content">
+                <h3 class="work-title">${item.title || ""}</h3>
+                ${authorsPart}
+                ${venuePart}
+                <p class="work-summary">${item.summary || ""}</p>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
 
       return `
-        <article class="work-card">
-          ${thumbnailPart}
-          <div class="work-content">
-            <div class="work-type">${typeLabel}</div>
-            <h3 class="work-title">${item.title || ""}</h3>
-            ${venuePart}
-            ${authorsPart}
-            <p class="work-summary">${item.summary || ""}</p>
-            <div class="work-meta">
-              <span>${year}</span>
-            </div>
-            ${tags}
+        <section class="work-year-group">
+          <div class="work-year">${year}</div>
+          <div class="work-year-items">
+            ${works}
           </div>
-        </article>
+        </section>
       `;
     })
     .join("");
-
-  // 태그 버튼에 이벤트 바인딩 (컴포넌트가 바뀔 때마다 새로 바인딩)
-  $$("#work-list .tag").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const tag = btn.dataset.tag;
-      // 이미 선택된 태그면 해제, 아니면 이 태그 선택
-      currentTag = currentTag === tag ? null : tag;
-      renderWorkCards();
-    });
-  });
 }
 
 if (workFilterButtons.length) {
@@ -130,8 +120,6 @@ if (workFilterButtons.length) {
       currentType = btn.dataset.filter || "all";
       workFilterButtons.forEach((b) => b.classList.remove("active"));
       btn.classList.add("active");
-      // 타입 필터를 바꾸면 태그 필터는 초기화 (선택 사항)
-      currentTag = null;
       renderWorkCards();
     });
   });
