@@ -47,6 +47,76 @@ async function loadWorkData() {
 
 let currentType = "all";
 
+function getWorkTypeLabel(type) {
+  if (type === "publication") return "Publication";
+  if (type === "patent") return "Patent";
+  if (type === "project") return "Project";
+  return type || "";
+}
+
+function getWorkLinks(item) {
+  const links = [];
+
+  const addLink = (label, url) => {
+    if (!url || typeof url !== "string") return;
+    const lowerLabel = String(label || "Link").toLowerCase();
+    const normalizedLabel =
+      lowerLabel === "code" ? "Code" : lowerLabel === "pdf" ? "PDF" : lowerLabel === "link" ? "Link" : label || "Link";
+    const hasSameUrl = links.some((link) => link.url === url);
+    if (!hasSameUrl) links.push({ label: normalizedLabel, url });
+  };
+
+  const addLinks = (value, fallbackLabel = "Link") => {
+    if (!value) return;
+
+    if (typeof value === "string") {
+      addLink(fallbackLabel, value);
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      value.forEach((link) => {
+        if (typeof link === "string") {
+          addLink(fallbackLabel, link);
+          return;
+        }
+
+        if (link && typeof link === "object") {
+          const url = link.url || link.href;
+          if (url) {
+            addLink(link.label || fallbackLabel, url);
+            return;
+          }
+
+          Object.entries(link).forEach(([label, nestedUrl]) => {
+            addLink(label, nestedUrl);
+          });
+        }
+      });
+      return;
+    }
+
+    if (typeof value === "object") {
+      Object.entries(value).forEach(([label, url]) => {
+        addLink(label, url);
+      });
+    }
+  };
+
+  addLinks(item.links);
+
+  if (item.link && typeof item.link === "object") {
+    addLinks(item.link);
+  } else {
+    addLinks(item.link, "Link");
+  }
+
+  addLinks(item.pdf, "PDF");
+  addLinks(item.code, "Code");
+
+  return links;
+}
+
 function renderWorkCards() {
   if (!workListEl) return;
 
@@ -74,28 +144,39 @@ function renderWorkCards() {
       const works = groupItems
         .map((item) => {
           const thumbnailImage = item.thumbnail
-            ? `<img src="${item.thumbnail}" alt="${item.title}" loading="lazy">`
+            ? `<img src="${escapeHtml(item.thumbnail)}" alt="${escapeHtml(item.title || "")}" loading="lazy">`
             : "";
           const thumbnailPart = thumbnailImage
-            ? `<div class="work-thumbnail">${item.link ? `<a href="${item.link}" target="_blank" rel="noreferrer">${thumbnailImage}</a>` : thumbnailImage}</div>`
+            ? `<div class="work-thumbnail">${thumbnailImage}</div>`
             : "";
 
           const authorsPart = item.authors
-            ? `<div class="work-authors">${item.authors.replace("Kyumin Kim", "<strong>Kyumin Kim</strong>")}</div>`
+            ? `<div class="work-authors">${escapeHtml(item.authors).replace("Kyumin Kim", "<strong>Kyumin Kim</strong>")}</div>`
             : "";
 
-          const venuePart = item.venue
-            ? `<div class="work-venue">${item.venue}</div>`
+          const venueText = item.venue || getWorkTypeLabel(item.type);
+          const venuePart = venueText
+            ? `<div class="work-venue">${escapeHtml(venueText)}</div>`
+            : "";
+          const links = getWorkLinks(item);
+          const linksPart = links.length
+            ? `<div class="work-links">${links
+                .map((link) => {
+                  const label = link.label || "Link";
+                  return `<a class="work-link-button" href="${escapeHtml(link.url)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a>`;
+                })
+                .join("")}</div>`
             : "";
 
           return `
             <article class="work-card">
               ${thumbnailPart}
               <div class="work-content">
-                <h3 class="work-title">${item.title || ""}</h3>
+                <h3 class="work-title">${escapeHtml(item.title || "")}</h3>
                 ${authorsPart}
                 ${venuePart}
-                <p class="work-summary">${item.summary || ""}</p>
+                ${linksPart}
+                <p class="work-summary">${escapeHtml(item.summary || "")}</p>
               </div>
             </article>
           `;

@@ -8,8 +8,9 @@ html,
 body {
   margin: 0;
   padding: 0;
-  font-family: "Pretendard", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+    "Apple SD Gothic Neo", "Noto Sans KR", Arial, sans-serif;
+  font-size: 16px;
   background: #ffffff;
   color: #1f2937;
 }
@@ -30,13 +31,13 @@ button {
 
 .container {
   width: 100%;
-  max-width: 1120px;
+  max-width: 1040px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 18px;
 }
 
 .section {
-  padding: 20px 0 20px;
+  padding: 16px 0;
 }
 
 .section-alt {
@@ -47,21 +48,21 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 24px;
-  margin-bottom: 24px;
+  gap: 18px;
+  margin-bottom: 18px;
 }
 
 .section-header-left h2 {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 700;
-  margin: 0 0 8px;
+  margin: 0 0 5px;
 }
 
 .section-header-left p {
   margin: 0;
   color: #6b7280;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: 1.5;
 }
 
 .site-header {
@@ -77,7 +78,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 20px;
+  padding: 5px 18px;
 }
 
 .logo {
@@ -97,8 +98,8 @@ button {
 
 .logo-text {
   font-weight: 600;
-  letter-spacing: 0.04em;
-  font-size: 14px;
+  letter-spacing: 0;
+  font-size: 15px;
 }
 
 .nav {
@@ -110,13 +111,13 @@ button {
 .nav-list {
   list-style: none;
   display: flex;
-  gap: 20px;
+  gap: 18px;
   padding: 0;
   margin: 0;
 }
 
 .nav-list a {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
   display: flex;
   align-items: center;
@@ -189,43 +190,49 @@ button {
 }
 
 .hero {
-  padding-top: 12px;
-  padding-bottom: 12px;
+  padding-top: 10px;
+  padding-bottom: 8px;
 }
 
 .hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-  gap: 40px;
+  gap: 28px;
   align-items: center;
 }
 
+.hero-text {
+  min-width: 0;
+}
+
 .hero-kicker {
-  font-size: 13px;
-  letter-spacing: 0.16em;
+  font-size: 14px;
+  letter-spacing: 0.08em;
   color: #6b7280;
   text-transform: uppercase;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .hero-title {
-  font-size: 32px;
+  font-size: 38px;
   font-weight: 700;
-  margin: 0 0 8px;
+  margin: 0 0 6px;
 }
 
 .hero-title span {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 400;
   color: #6b7280;
 }
 
 .hero-subtitle {
-  margin: 0 0 16px;
+  margin: 0 0 12px;
   color: #4b5563;
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 16px;
+  line-height: 1.55;
   text-align: justify;
+  max-width: 100%;
+  overflow-wrap: break-word;
 }
 
 .hero-subtitle a {
@@ -242,16 +249,16 @@ button {
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 9px 18px;
-  font-size: 14px;
+  padding: 8px 16px;
+  font-size: 15px;
   border-radius: 999px;
   border: 1px solid transparent;
   cursor: pointer;
@@ -285,10 +292,10 @@ button {
 .hero-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  font-size: 13px;
+  gap: 10px;
+  font-size: 14px;
   color: #6b7280;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .hero-links {
@@ -296,7 +303,7 @@ button {
   align-items: center;
   flex-wrap: wrap;
   gap: 6px;
-  font-size: 13px;
+  font-size: 14px;
   color: #374151;
 }
 
@@ -316,8 +323,8 @@ button {
 
 .profile-card {
   width: 100%;
-  max-width: 280px;
-  border-radius: 20px;
+  max-width: 270px;
+  border-radius: 12px;
   background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.04);
@@ -325,7 +332,7 @@ button {
 }
 
 .profile-avatar {
-  height: 220px;
+  height: 210px;
   background-color: #ffffff;
   background-image: url("data/kkm.jpg");
   background-size: cover;
@@ -341,23 +348,23 @@ button {
 }
 
 .profile-body {
-  padding: 14px 16px 16px;
+  padding: 12px 14px 14px;
 }
 
 .profile-body h2 {
   margin: 0 0 1px;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .profile-role {
-  margin: 0 0 10px;
-  font-size: 12px;
+  margin: 0 0 8px;
+  font-size: 13px;
   color: #6b7280;
 }
 
 .profile-info {
   margin: 0;
-  font-size: 13px;
+  font-size: 14px;
   color: #4b5563;
 }
 
@@ -383,33 +390,33 @@ button {
 .about-rows {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 14px;
 }
 
 #about-details {
-  padding-top: 12px;
-  padding-bottom: 20px;
+  padding-top: 8px;
+  padding-bottom: 14px;
 }
 
 .about-card {
-  border-radius: 18px;
-  padding: 14.5px 18px 18px;
+  border-radius: 10px;
+  padding: 12px 16px 14px;
   background: #ffffff;
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.02);
 }
 
 .about-card h3 {
-  margin: 0 0 8px;
-  font-size: 16px;
+  margin: 0 0 6px;
+  font-size: 18px;
   color: #111827;
 }
 
 .about-card p {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
   color: #4b5563;
-  line-height: 1.7;
+  line-height: 1.55;
 }
 
 .about-list {
@@ -419,10 +426,10 @@ button {
 }
 
 .about-list li {
-  font-size: 14px;
+  font-size: 15px;
   color: #4b5563;
-  line-height: 1.6;
-  margin-bottom: 12px;
+  line-height: 1.5;
+  margin-bottom: 8px;
   padding-left: 14px;
   position: relative;
 }
@@ -439,7 +446,7 @@ button {
 }
 
 .about-duration {
-  font-size: 13px;
+  font-size: 14px;
   color: #9ca3af;
   font-weight: 400;
 }
@@ -475,8 +482,8 @@ button {
   border: 1px solid #e5e7eb;
   background: #ffffff;
   color: #4b5563;
-  font-size: 12px;
-  padding: 7px 12px;
+  font-size: 13px;
+  padding: 6px 11px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -504,9 +511,9 @@ button {
 .work-year-group {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 96px;
-  gap: 28px;
+  gap: 22px;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 32px 0 38px;
+  padding: 24px 0 28px;
 }
 
 .work-year-group:last-child {
@@ -518,14 +525,14 @@ button {
   grid-row: 1;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
 }
 
 .work-card {
   position: relative;
   display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
-  gap: 28px;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 22px;
   align-items: center;
   border-radius: 0;
   background: #ffffff;
@@ -542,7 +549,7 @@ button {
 
 .work-thumbnail {
   width: 100%;
-  max-width: 200px;
+  max-width: 240px;
   aspect-ratio: 16 / 9;
   overflow: hidden;
   align-self: center;
@@ -572,26 +579,55 @@ button {
 }
 
 .work-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 400;
   margin: 0;
   color: #111827;
   text-align: left;
   word-break: break-word;
-  line-height: 1.35;
+  line-height: 1.28;
   letter-spacing: 0;
 }
 
 .work-venue {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 400;
   color: #111827;
   margin-top: 0;
   font-style: italic;
 }
 
+.work-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 1px;
+}
+
+.work-link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22px;
+  padding: 3px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  color: #374151;
+  background: #ffffff;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 500;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.work-link-button:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  color: #111827;
+}
+
 .work-authors {
-  font-size: 15px;
+  font-size: 16px;
   color: #6b7280;
   margin-top: 0;
   margin-bottom: 0;
@@ -606,17 +642,17 @@ button {
 }
 
 .work-summary {
-  font-size: 14px;
+  font-size: 15px;
   color: #4b5563;
   margin: 0;
-  line-height: 1.55;
+  line-height: 1.5;
 }
 
 .work-year {
   grid-column: 2;
   grid-row: 1;
   justify-self: end;
-  font-size: 28px;
+  font-size: 30px;
   line-height: 1;
   font-weight: 300;
   color: #e5e7eb;
@@ -629,8 +665,8 @@ button {
   justify-content: center;
   border-radius: 999px;
   background: #f3f4f6;
-  padding: 4px 10px;
-  font-size: 11px;
+  padding: 4px 9px;
+  font-size: 12px;
   line-height: 1;
   color: #4b5563;
   border: 1px solid transparent;
@@ -652,12 +688,12 @@ button {
 .photo-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
 }
 
 .photo-item {
   position: relative;
-  border-radius: 16px;
+  border-radius: 10px;
   overflow: hidden;
   cursor: zoom-in;
   background: #f3f4f6;
@@ -1194,8 +1230,8 @@ button {
   }
 
   .work-card {
-    grid-template-columns: 160px minmax(0, 1fr);
-    gap: 20px;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 18px;
   }
 
   .work-title {
@@ -1216,8 +1252,25 @@ button {
 }
 
 @media (max-width: 720px) {
+  .container {
+    max-width: 100vw;
+  }
+
   .site-header-inner {
-    padding: 6px 20px;
+    width: 100vw;
+    max-width: 100vw;
+    padding: 6px 14px;
+    gap: 14px;
+  }
+
+  .logo-text {
+    display: none;
+  }
+
+  .nav {
+    flex: 1;
+    justify-content: flex-end;
+    min-width: 0;
   }
 
   .nav-toggle {
@@ -1227,7 +1280,8 @@ button {
   .nav-list {
     display: flex;
     flex-direction: row;
-    gap: 12px;
+    gap: 11px;
+    min-width: 0;
     padding: 0;
     margin: 0;
     position: static;
@@ -1240,12 +1294,11 @@ button {
 
   .nav-list a {
     font-size: 13px;
-    gap: 4px;
+    gap: 0;
   }
 
   .nav-icon {
-    width: 14px;
-    height: 14px;
+    display: none;
   }
 
   .section {
@@ -1266,18 +1319,30 @@ button {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    width: 100%;
+    max-width: calc(100vw - 36px);
   }
 
   .hero-grid {
     gap: 24px;
+    width: 100%;
+    max-width: 100%;
   }
 
   .hero-title {
-    font-size: 26px;
+    font-size: 29px;
   }
 
   .hero-title span {
-    font-size: 15px;
+    font-size: 16px;
+  }
+
+  .hero-subtitle {
+    width: 100%;
+    max-width: calc(100vw - 36px);
+    font-size: 16px;
+    line-height: 1.55;
+    text-align: left;
   }
 
   .hero-actions {
@@ -1324,7 +1389,7 @@ button {
   }
 
   .work-thumbnail {
-    max-width: 100%;
+    max-width: min(100%, 320px);
   }
 
   .work-year-group {

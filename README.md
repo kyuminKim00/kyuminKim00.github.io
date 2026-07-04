@@ -28,7 +28,15 @@ npx serve .
 ### 2. Update Content
 You can update your data without touching the HTML structure by editing the JSON files in the `data/` folder.
 
-- **Work Data**: Edit `data/work.json`. Supports types: `publication`, `patent`, and `project`.
+- **Work Data**: Edit `data/work.json`. Supports types: `publication`, `patent`, and `project`. Use `links` for multiple buttons:
+  ```json
+  "links": [
+    { "label": "Link", "url": "https://example.com" },
+    { "label": "PDF", "url": "data/paper.pdf" },
+    { "label": "Code", "url": "https://github.com/user/repo" }
+  ]
+  ```
+  You can also use direct fields such as `"link"`, `"pdf"`, and `"code"`.
 - **Photo Data**: Edit `data/photos.json`. Update image URLs and metadata (location, camera, tags).
 
 ### 3. Photo Upload & Sync
