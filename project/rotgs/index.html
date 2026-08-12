@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="title" content="RotGS: Rotation-Guided 3D Gaussian Splatting for Turntable Sequences without Structure-from-Motion">
+  <meta name="description" content="RotGS reconstructs turntable-captured objects without Structure-from-Motion by optimizing a global rotation axis under optical-flow supervision.">
+  <meta name="keywords" content="3D Gaussian Splatting, 3D reconstruction, turntable capture, camera pose estimation, optical flow, computer graphics">
+  <meta name="author" content="Kyumin Kim, Dohae Lee, Hanul Baek, In-Kwon Lee">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Yonsei University">
+  <meta property="og:title" content="RotGS: Rotation-Guided 3D Gaussian Splatting for Turntable Sequences without Structure-from-Motion">
+  <meta property="og:description" content="SfM-free 3D Gaussian Splatting for turntable sequences using rotation-flow supervision.">
+  <meta property="og:url" content="https://kyumin.kr/project/rotgs/">
+  <meta property="og:image" content="https://kyumin.kr/project/rotgs/static/images/teaser.png">
+  <meta property="og:image:alt" content="RotGS reconstruction overview">
+  <meta property="article:published_time" content="2026-01-01T00:00:00Z">
+  <meta property="article:author" content="Kyumin Kim">
+  <meta property="article:section" content="Research">
+  <meta property="article:tag" content="3D Gaussian Splatting">
+  <meta property="article:tag" content="3D Reconstruction">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="RotGS: Rotation-Guided 3D Gaussian Splatting for Turntable Sequences without Structure-from-Motion">
+  <meta name="twitter:description" content="SfM-free 3D Gaussian Splatting for turntable sequences using rotation-flow supervision.">
+  <meta name="twitter:image" content="https://kyumin.kr/project/rotgs/static/images/teaser.png">
+  <meta name="twitter:image:alt" content="RotGS reconstruction overview">
+
+  <meta name="citation_title" content="RotGS: Rotation-Guided 3D Gaussian Splatting for Turntable Sequences without Structure-from-Motion">
+  <meta name="citation_author" content="Kim, Kyumin">
+  <meta name="citation_author" content="Lee, Dohae">
+  <meta name="citation_author" content="Baek, Hanul">
+  <meta name="citation_author" content="Lee, In-Kwon">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_journal_title" content="Computer Graphics Forum">
+  <meta name="citation_volume" content="45">
+  <meta name="citation_issue" content="2">
+  <meta name="citation_doi" content="10.1111/cgf.70317">
+  <meta name="citation_pdf_url" content="https://kyumin.kr/project/rotgs/static/pdfs/paper.pdf">
+
+  <meta name="theme-color" content="#2563eb">
+  <title>RotGS | Eurographics 2026</title>
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+  <link rel="preload" href="static/css/fontawesome.all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="static/css/fontawesome.all.min.css"></noscript>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "RotGS: Rotation-Guided 3D Gaussian Splatting for Turntable Sequences without Structure-from-Motion",
+    "description": "RotGS reconstructs turntable-captured objects without Structure-from-Motion by optimizing a global rotation axis under optical-flow supervision.",
+    "author": [
+      {"@type": "Person", "name": "Kyumin Kim"},
+      {"@type": "Person", "name": "Dohae Lee"},
+      {"@type": "Person", "name": "Hanul Baek"},
+      {"@type": "Person", "name": "In-Kwon Lee"}
+    ],
+    "datePublished": "2026",
+    "isPartOf": {"@type": "Periodical", "name": "Computer Graphics Forum"},
+    "publisher": {"@type": "Organization", "name": "The Eurographics Association and John Wiley & Sons Ltd."},
+    "url": "https://kyumin.kr/project/rotgs/",
+    "image": "https://kyumin.kr/project/rotgs/static/images/teaser.png",
+    "keywords": ["3D Gaussian Splatting", "3D reconstruction", "turntable capture", "optical flow"],
+    "sameAs": "https://doi.org/10.1111/cgf.70317",
+    "isAccessibleForFree": true
+  }
+  </script>
+</head>
+<body>
+  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <main id="main-content">
+    <section class="hero">
+      <div class="hero-body">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered">
+            <div class="column has-text-centered">
+              <h1 class="title is-1 publication-title">RotGS: Rotation-Guided 3D Gaussian Splatting for Turntable Sequences without Structure-from-Motion</h1>
+              <div class="is-size-5 publication-authors">
+                <span class="author-block"><a href="https://kyumin.kr/" target="_blank" rel="noreferrer">Kyumin Kim</a>,</span>
+                <span class="author-block">Dohae Lee,</span>
+                <span class="author-block">Hanul Baek,</span>
+                <span class="author-block">In-Kwon Lee</span>
+              </div>
+              <div class="is-size-5 publication-authors">
+                <span class="author-block">Yonsei University &middot; MeTown Inc.<br>Eurographics 2026</span>
+              </div>
+              <div class="column has-text-centered">
+                <div class="publication-links">
+                  <span class="link-block">
+                    <a href="static/pdfs/paper.pdf" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon"><i class="fas fa-file-pdf"></i></span><span>Paper</span>
+                    </a>
+                  </span>
+                  <span class="link-block">
+                    <a href="https://doi.org/10.1111/cgf.70317" target="_blank" rel="noreferrer" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon"><i class="fas fa-external-link-alt"></i></span><span>Publication</span>
+                    </a>
+                  </span>
+                  <span class="link-block">
+                    <a href="https://github.com/kyuminKim00/RotGS" target="_blank" rel="noreferrer" class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon"><i class="fab fa-github"></i></span><span>Code</span>
+                    </a>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="hero teaser">
+      <div class="container is-max-desktop">
+        <div class="hero-body">
+          <img src="static/images/teaser.png" alt="RotGS turntable setup and reconstruction comparison">
+          <h2 class="subtitle has-text-centered">
+            RotGS reconstructs turntable sequences without SfM by representing object motion with a shared global rotation axis.
+          </h2>
+        </div>
+      </div>
+    </section>
+
+    <section class="section hero is-light">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3">Abstract</h2>
+            <div class="content has-text-justified">
+              <p>
+                The field of 3D reconstruction from multi-view images has advanced rapidly thanks to 3D Gaussian Splatting (3DGS), which enables efficient and photorealistic scene representation. However, optimizing 3DGS requires high-quality images from various viewpoints with accurate camera poses. The repeated collection of such data demands significant human effort, which poses a major constraint in practical applications. To address this issue, automated capturing systems that use a turntable and fixed camera are widely employed. In a turntable setup, the background remains stationary while the object rotates. Therefore, preprocessing to remove the background is essential, but this reduces the number of reliable feature matches and destabilizes Structure-from-Motion (SfM). This results in inaccurate camera poses and degrades the quality of 3DGS reconstruction. We propose a novel method to optimize 3DGS in a turntable setup without SfM by leveraging the prior knowledge that objects rotate around a central axis. Unlike previous SfM-free methods that estimate camera poses for each frame, our approach reduces the complexity of optimization by representing rotations with a single global rotation axis. The estimated rotation is directly applied to the 3D Gaussians, producing motion defined as rotation flow. This rotation flow is aligned with optical flow to provide strong geometric supervision. Through uncertainty-to-detail flow scheduling, our approach remains stable during the initial training stage when the geometry of the Gaussian set is still inaccurate. On the NeRF-Synthetic dataset and real-world datasets captured with a turntable, our method outperforms existing SfM-free approaches in both reconstruction quality and training speed, while demonstrating performance comparable to 3DGS optimized with precise camera poses.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered">Method Overview</h2>
+        <figure>
+          <img src="static/images/pipeline.png" alt="Overview of the RotGS optimization pipeline" loading="lazy">
+          <figcaption class="subtitle has-text-centered">
+            RotGS jointly optimizes 3D Gaussians and a compact rotation model, using optical flow as geometric supervision without relying on SfM camera poses.
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section hero is-light">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered">Rotation Flow</h2>
+        <figure>
+          <img src="static/images/rotation_flow.png" alt="Rotation flow formulation and supervision" loading="lazy">
+          <figcaption class="subtitle has-text-centered">
+            A shared global rotation axis defines Gaussian motion across frames, and the resulting rotation flow is aligned with observed optical flow.
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered">Results</h2>
+        <figure>
+          <img src="static/images/synthetic_exper.png" alt="RotGS results on the NeRF-Synthetic dataset" loading="lazy">
+          <figcaption class="subtitle has-text-centered">
+            RotGS improves reconstruction quality and training speed over existing SfM-free approaches on synthetic and real-world turntable sequences.
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section hero is-light">
+      <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered">Supplementary Video</h2>
+        <video controls muted loop preload="metadata" style="width: 100%;">
+          <source src="static/videos/supplementary.mp4" type="video/mp4">
+        </video>
+      </div>
+    </section>
+
+    <section class="section" id="BibTeX">
+      <div class="container is-max-desktop content">
+        <div class="bibtex-header">
+          <h2 class="title">BibTeX</h2>
+          <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
+            <i class="fas fa-copy"></i><span class="copy-text">Copy</span>
+          </button>
+        </div>
+        <pre id="bibtex-code"><code>@article{10.1111:cgf.70317,
+  journal = {Computer Graphics Forum},
+  title = {{RotGS: Rotation-Guided 3D Gaussian Splatting for Turntable Sequences without Structure-from-Motion}},
+  author = {Kim, Kyumin and Lee, Dohae and Baek, Hanul and Lee, In-Kwon},
+  year = {2026},
+  publisher = {The Eurographics Association and John Wiley &amp; Sons Ltd.},
+  ISSN = {1467-8659},
+  DOI = {10.1111/cgf.70317}
+}</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank" rel="noreferrer">Academic Project Page Template</a>, adopted from the <a href="https://nerfies.github.io" target="_blank" rel="noreferrer">Nerfies</a> project page.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

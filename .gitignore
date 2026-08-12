@@ -5,6 +5,7 @@ __pycache__/
 tools/photos/cloudinary_config.py
 tools/photos/upload_config.json
 tools/photos/upload_configs/
+/project/Academic-project-page-template/
 # 보안을 위해 API Secret이 포함된 스크립트 제외
 # 필요하다면 원본 데이터 제외 (이미 생성된 json만 배포)
 # data/photos.json은 사이트 동작에 필요하므로 제외하지 않습니다.
