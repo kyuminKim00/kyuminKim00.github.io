@@ -31,7 +31,7 @@ let allWorks = [];
 
 async function loadWorkData() {
   try {
-    const res = await fetch("data/work.json");
+    const res = await fetch("data/work.json", { cache: "no-store" });
     if (!res.ok) throw new Error("Failed to load work.json");
     const data = await res.json();
     allWorks = data;
