@@ -21,22 +21,27 @@ def parse_tags(raw_tags, city, country):
     return tags or ["landscape"]
 
 
-def load_upload_config(config_path):
+def load_upload_config(config_path, upload_folder=None):
     try:
         with open(config_path, "r", encoding="utf-8") as f:
             config = json.load(f)
-    except FileNotFoundError:
-        print(f"Error: 업로드 config 파일을 찾을 수 없습니다: {config_path}")
-        sys.exit(1)
+    except FileNotFoundError as error:
+        raise FileNotFoundError(f"업로드 config 파일을 찾을 수 없습니다: {config_path}") from error
     except json.JSONDecodeError as e:
-        print(f"Error: 업로드 config JSON 형식이 올바르지 않습니다: {e}")
-        sys.exit(1)
+        raise ValueError(f"업로드 config JSON 형식이 올바르지 않습니다: {e}") from e
+
+    if upload_folder:
+        config["upload_folder"] = os.path.abspath(os.path.expanduser(upload_folder))
+    elif config.get("upload_folder"):
+        configured_folder = os.path.expanduser(config["upload_folder"])
+        if not os.path.isabs(configured_folder):
+            configured_folder = os.path.join(os.path.dirname(os.path.abspath(config_path)), configured_folder)
+        config["upload_folder"] = os.path.abspath(configured_folder)
 
     required_fields = ("upload_folder", "city", "country")
     missing_fields = [field for field in required_fields if not config.get(field)]
     if missing_fields:
-        print(f"Error: 업로드 config에 필수 값이 없습니다: {', '.join(missing_fields)}")
-        sys.exit(1)
+        raise ValueError(f"업로드 config에 필수 값이 없습니다: {', '.join(missing_fields)}")
 
     return {
         "upload_folder": config["upload_folder"],
@@ -44,6 +49,19 @@ def load_upload_config(config_path):
         "country": config["country"],
         "tags": parse_tags(config.get("tags", ["landscape"]), config["city"], config["country"]),
     }
+
+
+def validate_cloudinary_config():
+    required_fields = ("cloud_name", "api_key", "api_secret")
+    missing_fields = [
+        field
+        for field in required_fields
+        if not CLOUDINARY_CONFIG.get(field) or str(CLOUDINARY_CONFIG[field]).startswith("YOUR_")
+    ]
+    if missing_fields:
+        raise ValueError(
+            f"cloudinary_config.py에 Cloudinary 설정이 필요합니다: {', '.join(missing_fields)}"
+        )
 
 
 def get_exif_data(image_path, location):
@@ -95,6 +113,7 @@ def upload_folder(folder_path, city, country, tags):
     
     image_extensions = ('.jpg', '.jpeg', '.png')
     uploaded_count = 0
+    failed_count = 0
 
     for root, dirs, files in os.walk(folder_path):
         for file in files:
@@ -128,8 +147,10 @@ def upload_folder(folder_path, city, country, tags):
                     
                 except Exception as e:
                     print(f"  업로드 에러 ({file}): {e}")
+                    failed_count += 1
 
-    print(f"\n총 {uploaded_count}개의 파일을 업로드했습니다.")
+    print(f"\n총 {uploaded_count}개의 파일을 업로드했습니다. 실패: {failed_count}개")
+    return uploaded_count, failed_count
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload local photos to Cloudinary with shared metadata.")
@@ -145,15 +166,20 @@ if __name__ == "__main__":
         print("명령어: pip install Pillow cloudinary")
         sys.exit(1)
 
-    upload_config = load_upload_config(args.config)
-    upload_folder_path = upload_config["upload_folder"]
+    try:
+        validate_cloudinary_config()
+        upload_config = load_upload_config(args.config)
+        upload_folder_path = upload_config["upload_folder"]
 
-    if os.path.exists(upload_folder_path):
+        if not os.path.isdir(upload_folder_path):
+            raise FileNotFoundError(f"폴더를 찾을 수 없습니다: {upload_folder_path}")
+
         upload_folder(
             upload_folder_path,
             city=upload_config["city"],
             country=upload_config["country"],
             tags=upload_config["tags"],
         )
-    else:
-        print(f"Error: 폴더를 찾을 수 없습니다: {upload_folder_path}")
+    except (FileNotFoundError, ValueError) as error:
+        print(f"Error: {error}")
+        sys.exit(1)

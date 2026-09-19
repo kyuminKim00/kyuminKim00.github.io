@@ -59,6 +59,37 @@ def compress_image(file_path, target_size_mb=10):
         
     return True
 
+
+def compress_folder(base_path, target_size_mb=10):
+    if not os.path.isdir(base_path):
+        raise FileNotFoundError(f"폴더를 찾을 수 없습니다: {base_path}")
+
+    image_extensions = ('.jpg', '.jpeg', '.png')
+    count = 0
+
+    print(f"'{base_path}' 폴더의 이미지 검사 및 압축을 시작합니다 (기준: {target_size_mb}MB)...")
+
+    for root, dirs, files in os.walk(base_path):
+        dirs[:] = [directory for directory in dirs if directory not in {'node_modules', '.git', 'venv', '.venv'}]
+
+        for file in files:
+            if not file.lower().endswith(image_extensions):
+                continue
+
+            full_path = os.path.join(root, file)
+            try:
+                if compress_image(full_path, target_size_mb=target_size_mb):
+                    count += 1
+            except Exception as error:
+                print(f"Error processing {full_path}: {error}")
+
+    if count == 0:
+        print(f"압축이 필요한({target_size_mb}MB 초과) 파일이 발견되지 않았습니다.")
+    else:
+        print(f"\n총 {count}개의 이미지를 압축했습니다.")
+
+    return count
+
 def main():
     parser = argparse.ArgumentParser(description="Compress photos in the upload config folder.")
     parser.add_argument("config", help="업로드 설정 JSON 파일 경로")
@@ -91,30 +122,7 @@ def main():
         print(f"Error: 폴더를 찾을 수 없습니다: {base_path}")
         return
 
-    # 이미지 확장자 탐색
-    image_extensions = ('.jpg', '.jpeg', '.png')
-    count = 0
-    
-    print(f"'{base_path}' 폴더의 이미지 검사 및 압축을 시작합니다 (기준: {args.target_mb}MB)...")
-    
-    for root, dirs, files in os.walk(base_path):
-        # 가상환경이나 노드 모듈 제외 (성능 및 안전)
-        if any(ignored in root for ignored in ['node_modules', '.git', 'venv']):
-            continue
-            
-        for file in files:
-            if file.lower().endswith(image_extensions):
-                full_path = os.path.join(root, file)
-                try:
-                    if compress_image(full_path, target_size_mb=args.target_mb):
-                        count += 1
-                except Exception as e:
-                    print(f"Error processing {full_path}: {e}")
-    
-    if count == 0:
-        print("압축이 필요한(10MB 초과) 파일이 발견되지 않았습니다.")
-    else:
-        print(f"\n총 {count}개의 이미지를 압축했습니다.")
+    compress_folder(base_path, target_size_mb=args.target_mb)
 
 if __name__ == "__main__":
     main()

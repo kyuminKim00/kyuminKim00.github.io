@@ -5,6 +5,7 @@ import os
 import sys
 from pathlib import Path
 from cloudinary_config import CLOUDINARY_CONFIG
+from geocode_locations import sync_photo_locations
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PHOTOS_JSON = PROJECT_ROOT / "data" / "photos.json"
@@ -12,7 +13,7 @@ PHOTOS_JSON = PROJECT_ROOT / "data" / "photos.json"
 def sync_photos():
     if CLOUDINARY_CONFIG["api_key"] == "YOUR_API_KEY":
         print("Error: cloudinary_config.py 파일을 열어 CLOUDINARY_CONFIG에 본인의 API Key와 Secret을 입력해주세요.")
-        return
+        return False
 
     try:
         cloudinary.config(**CLOUDINARY_CONFIG)
@@ -58,14 +59,19 @@ def sync_photos():
         # data/photos.json 파일 업데이트
         with open(PHOTOS_JSON, 'w', encoding='utf-8') as f:
             json.dump(photo_list, f, indent=2, ensure_ascii=False)
+
+        # 새 촬영 지역은 OpenStreetMap에서 한 번만 검색해 좌표 파일에 캐시합니다.
+        sync_photo_locations(photo_list)
         
         print(f"\n--- 동기화 완료! ---")
         print(f"대상 계정: {CLOUDINARY_CONFIG['cloud_name']}")
         print(f"업데이트된 사진 수: {len(photo_list)}개")
         print(f"결과 파일: {PHOTOS_JSON}")
+        return True
 
     except Exception as e:
         print(f"에러 발생: {e}")
+        return False
 
 if __name__ == "__main__":
     # 필요한 라이브러리 체크

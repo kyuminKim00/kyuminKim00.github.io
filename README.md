@@ -43,32 +43,40 @@ You can update your data without touching the HTML structure by editing the JSON
 The photo gallery uses **Cloudinary** URLs stored in `data/photos.json`.
 
 One-time setup:
-1. Fill in `tools/photos/cloudinary_config.py`: `cloud_name`, `api_key`, and `api_secret` from the Cloudinary dashboard.
-2. Set `tools/photos/upload_config.json`: `upload_folder`, `city`, `country`, and `tags` for the photo batch you want to upload.
 
-Update workflow:
-1. Put the photos for one location/batch in the folder listed in `upload_config.json`.
-2. Optional: compress large files before upload.
-   ```powershell
-   python .\tools\photos\compress_images.py .\tools\photos\upload_config.json
+1. Fill in `tools/photos/cloudinary_config.py` with `cloud_name`, `api_key`, and `api_secret` from Cloudinary.
+2. Copy `tools/photos/upload_config.example.json` to `tools/photos/upload_config.json` and set the photo folder and batch metadata:
+
+   ```json
+   {
+     "upload_folder": "C:\\Photos\\Cheonan",
+     "city": "Cheonan",
+     "country": "Korea",
+     "tags": ["cheonan", "korea", "landscape"]
+   }
    ```
-3. Upload the batch to Cloudinary with shared city/country/tag metadata.
-   ```powershell
-   python .\tools\photos\upload_to_cloudinary.py .\tools\photos\upload_config.json
-   ```
-4. Regenerate `data/photos.json` from Cloudinary.
-   ```powershell
-   python .\tools\photos\sync_cloudinary.py
-   ```
-5. Check the gallery locally.
-   ```powershell
-   npx serve .
-   ```
+
+Run the complete workflow with one command and one JSON argument:
+
+```powershell
+python .\tools\photos\photo_pipeline.py .\tools\photos\upload_config.json
+```
+
+The pipeline automatically:
+
+1. Compresses images larger than 10 MB in the configured folder.
+2. Reads the camera and capture date from EXIF.
+3. Uploads every JPG, JPEG, and PNG to Cloudinary with the configured location and tags.
+4. Regenerates `data/photos.json` from Cloudinary.
+5. Looks up coordinates for new locations and caches them in `data/photo-locations.json`.
+
+Existing coordinates are reused, so the geocoding service is only called for new locations. To use a different compression limit, add `--target-mb`, for example `--target-mb 8`.
 
 Notes:
 - `shotAt` and `camera` are read from EXIF when available.
 - `location` is saved as `city, country` from the upload config.
 - `city` and `country` are also added as Cloudinary tags, along with the tags in the config.
+- Compression updates oversized source images in place before upload.
 - `tools/photos/cloudinary_config.py` and `tools/photos/upload_config.json` are ignored by Git because they contain local paths or secrets.
 
 ## Deployment

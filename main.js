@@ -219,32 +219,17 @@ const photoMapSummaryEl = $("#photo-map-summary");
 
 let allPhotos = [];
 let currentFilteredPhotos = [];
+let currentModalPhotos = [];
 let currentPhotoIndex = -1;
 let currentPhotoTag = null;
+let photoModalReturnToMap = false;
+let mapPhotoHistoryActive = false;
 let pendingMapFocusLocation = null;
 let selectedMapLocation = null;
+let photoLeafletMap = null;
+const photoLeafletMarkers = new Map();
 
-const photoLocationCoordinates = {
-  "Bohol, Philippines": [9.8499, 124.1435],
-  "Boracay, Pilipinas": [11.9674, 121.9248],
-  "Busan, Korea": [35.1796, 129.0756],
-  "China, Qingdao": [36.0671, 120.3826],
-  "Chuncheon, Korea": [37.8813, 127.7298],
-  "Gangneung, Korea": [37.7519, 128.8761],
-  "Germany, Aachen": [50.7753, 6.0839],
-  "Germany, Cologne": [50.9375, 6.9603],
-  "Germany, Frankfurt": [50.1109, 8.6821],
-  "Germany, Mainz": [49.9929, 8.2473],
-  "Hokkaido, Japan": [43.0642, 141.3469],
-  "Hualien, Taiwan": [23.9872, 121.6015],
-  "Incheon, Korea": [37.4563, 126.7052],
-  "Jeju, Korea": [33.4996, 126.5312],
-  "Kitakyushu, Japan": [33.8834, 130.8751],
-  "LA, USA": [34.0522, -118.2437],
-  "Las Vegas, USA": [36.1716, -115.1391],
-  "San Francisco, USA": [37.7749, -122.4194],
-  "Seoul, Korea": [37.5665, 126.9780],
-};
+const photoLocationCoordinates = {};
 
 const photoLocationColors = {
   Korea: "#ef4444",
@@ -268,9 +253,18 @@ function escapeHtml(value) {
 
 async function loadPhotoData() {
   try {
-    const res = await fetch("data/photos.json");
-    if (!res.ok) throw new Error("Failed to load photos.json");
-    const data = await res.json();
+    const [photoResponse, locationResponse] = await Promise.all([
+      fetch("data/photos.json"),
+      fetch("data/photo-locations.json"),
+    ]);
+    if (!photoResponse.ok) throw new Error("Failed to load photos.json");
+    if (!locationResponse.ok) throw new Error("Failed to load photo-locations.json");
+
+    const [data, locations] = await Promise.all([
+      photoResponse.json(),
+      locationResponse.json(),
+    ]);
+    Object.assign(photoLocationCoordinates, locations);
     // shotAt 기준 내림차순 정렬 (최신순)
     data.sort((a, b) => {
       const dateA = a.shotAt || "";
@@ -369,11 +363,15 @@ function renderPhotos() {
   });
 }
 
-function openPhotoModal(index) {
-  if (!photoModalEl || !photoModalImg || index < 0 || index >= currentFilteredPhotos.length) return;
+function openPhotoModal(index, photos = currentFilteredPhotos, options = {}) {
+  if (!photoModalEl || !photoModalImg || index < 0 || index >= photos.length) return;
 
+  const returnToMap = Boolean(options.returnToMap);
+  const isAlreadyOpen = photoModalEl.classList.contains("is-open");
+  photoModalReturnToMap = returnToMap;
+  currentModalPhotos = photos;
   currentPhotoIndex = index;
-  const photo = currentFilteredPhotos[index];
+  const photo = currentModalPhotos[index];
   // 원본 크기가 너무 클 수 있으므로 최대 가로 너비를 1920px로 제한하고 최적화(q_auto, f_auto)를 적용합니다.
   const fullUrl = photo.url.replace('/upload/', '/upload/w_1920,c_limit,q_auto,f_auto/');
   const meta = [photo.location, photo.shotAt, photo.camera].filter(Boolean).join(" · ");
@@ -383,7 +381,17 @@ function openPhotoModal(index) {
   photoModalImg.style.transition = "opacity 0.25s ease";
 
   photoModalEl.classList.add("is-open");
+  photoModalEl.classList.toggle("from-map", returnToMap);
   photoModalEl.setAttribute("aria-hidden", "false");
+  document.body.classList.add("photo-modal-open");
+
+  if (returnToMap && photoMapModalEl) {
+    photoMapModalEl.setAttribute("aria-hidden", "true");
+    if (!isAlreadyOpen && options.pushHistory !== false) {
+      window.history.pushState({ photoMapViewer: true }, "");
+      mapPhotoHistoryActive = true;
+    }
+  }
 
   photoModalImg.src = fullUrl;
   photoModalImg.onload = () => {
@@ -399,8 +407,8 @@ function openPhotoModal(index) {
 function preloadAdjacentPhotos(currentIndex) {
   const neighbors = [currentIndex - 1, currentIndex + 1];
   neighbors.forEach(idx => {
-    if (idx >= 0 && idx < currentFilteredPhotos.length) {
-      const url = currentFilteredPhotos[idx].url.replace('/upload/', '/upload/w_1920,c_limit,q_auto,f_auto/');
+    if (idx >= 0 && idx < currentModalPhotos.length) {
+      const url = currentModalPhotos[idx].url.replace('/upload/', '/upload/w_1920,c_limit,q_auto,f_auto/');
       const img = new Image();
       img.src = url;
     }
@@ -409,16 +417,36 @@ function preloadAdjacentPhotos(currentIndex) {
 
 function navigatePhoto(direction) {
   const newIndex = currentPhotoIndex + direction;
-  if (newIndex >= 0 && newIndex < currentFilteredPhotos.length) {
-    openPhotoModal(newIndex);
+  if (newIndex >= 0 && newIndex < currentModalPhotos.length) {
+    openPhotoModal(newIndex, currentModalPhotos, {
+      returnToMap: photoModalReturnToMap,
+      pushHistory: false,
+    });
   }
 }
 
 function closePhotoModal() {
   if (!photoModalEl || !photoModalImg) return;
+  const shouldRestoreMap = photoModalReturnToMap && photoMapModalEl?.classList.contains("is-open");
   photoModalEl.classList.remove("is-open");
+  photoModalEl.classList.remove("from-map");
   photoModalEl.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("photo-modal-open");
+  if (shouldRestoreMap) {
+    photoMapModalEl.setAttribute("aria-hidden", "false");
+  }
   currentPhotoIndex = -1;
+  currentModalPhotos = [];
+  photoModalReturnToMap = false;
+  mapPhotoHistoryActive = false;
+}
+
+function requestClosePhotoModal() {
+  if (photoModalReturnToMap && mapPhotoHistoryActive) {
+    window.history.back();
+    return;
+  }
+  closePhotoModal();
 }
 
 function getPhotoLocationGroups() {
@@ -453,12 +481,92 @@ function getLocationColor(location) {
   return photoLocationColors[matchedKey] || "#111827";
 }
 
-function projectMapPoint(coords) {
-  const [lat, lng] = coords;
-  return {
-    x: ((lng + 180) / 360) * 1000,
-    y: ((90 - lat) / 180) * 500,
-  };
+function getPhotosForLocation(location) {
+  return allPhotos.filter((photo) => photo.location === location);
+}
+
+function createPhotoMapPopup(group) {
+  const photos = getPhotosForLocation(group.location);
+  const thumbnails = photos
+    .map((photo, index) => {
+      const thumbnailUrl = photo.url.replace(
+        "/upload/",
+        "/upload/c_fill,g_auto,w_240,h_180,q_auto,f_auto/"
+      );
+      const eagerSource = index < 9 ? `src="${escapeHtml(thumbnailUrl)}"` : `data-src="${escapeHtml(thumbnailUrl)}"`;
+      const labelParts = [photo.shotAt, photo.camera].filter(Boolean).join(" · ");
+
+      return `
+        <button
+          class="photo-map-popup-item"
+          type="button"
+          data-location="${escapeHtml(group.location)}"
+          data-photo-index="${index}"
+          aria-label="${escapeHtml(group.location)} 사진 ${index + 1} 열기"
+          title="${escapeHtml(labelParts)}"
+        >
+          <img ${eagerSource} alt="" loading="lazy" draggable="false">
+        </button>
+      `;
+    })
+    .join("");
+
+  return `
+    <section class="photo-map-popup-content" data-location="${escapeHtml(group.location)}">
+      <div class="photo-map-popup-header">
+        <strong>${escapeHtml(group.location)}</strong>
+        <span>${photos.length} photos</span>
+      </div>
+      <div class="photo-map-popup-grid" role="list" aria-label="${escapeHtml(group.location)} 사진 목록">
+        ${thumbnails}
+      </div>
+    </section>
+  `;
+}
+
+function handlePhotoMapPopupOpen(event) {
+  const popupElement = event.popup.getElement();
+  const content = popupElement?.querySelector(".photo-map-popup-content");
+  const grid = content?.querySelector(".photo-map-popup-grid");
+  if (!content || !grid) return;
+
+  L.DomEvent.disableClickPropagation(content);
+  L.DomEvent.disableScrollPropagation(grid);
+
+  if (!content.dataset.bound) {
+    content.dataset.bound = "true";
+    content.addEventListener("click", (clickEvent) => {
+      const button = clickEvent.target.closest(".photo-map-popup-item");
+      if (!button) return;
+
+      const locationPhotos = getPhotosForLocation(button.dataset.location);
+      const photoIndex = Number.parseInt(button.dataset.photoIndex, 10);
+      openPhotoModal(photoIndex, locationPhotos, { returnToMap: true });
+    });
+  }
+
+  const deferredImages = Array.from(grid.querySelectorAll("img[data-src]"));
+  if (!deferredImages.length) return;
+
+  if (!("IntersectionObserver" in window)) {
+    deferredImages.forEach((image) => {
+      image.src = image.dataset.src;
+      image.removeAttribute("data-src");
+    });
+    return;
+  }
+
+  const imageObserver = new IntersectionObserver((entries, observer) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const image = entry.target;
+      image.src = image.dataset.src;
+      image.removeAttribute("data-src");
+      observer.unobserve(image);
+    });
+  }, { root: grid, rootMargin: "80px" });
+
+  deferredImages.forEach((image) => imageObserver.observe(image));
 }
 
 function openPhotoMap(focusLocation = null) {
@@ -468,6 +576,7 @@ function openPhotoMap(focusLocation = null) {
   selectedMapLocation = focusLocation;
   photoMapModalEl.classList.add("is-open");
   photoMapModalEl.setAttribute("aria-hidden", "false");
+  document.body.classList.add("photo-map-open");
 
   renderPhotoMap();
 }
@@ -486,25 +595,6 @@ function renderPhotoMap() {
     groups.find((group) => group.location === pendingMapFocusLocation) ||
     groups[0];
 
-  const markerButtons = groups
-    .map((group) => {
-      const point = projectMapPoint(group.coords);
-      const isSelected = group.location === selectedGroup?.location;
-      return `
-        <button
-          class="photo-map-marker ${isSelected ? "is-selected" : ""}"
-          type="button"
-          style="left:${point.x / 10}%;top:${point.y / 5}%;--marker-color:${group.color};"
-          data-location="${escapeHtml(group.location)}"
-          aria-label="${escapeHtml(group.location)}: ${group.count} photos"
-        >
-          <span class="photo-map-marker-dot"></span>
-          <span class="photo-map-marker-label">${escapeHtml(group.location.split(",")[0])}</span>
-        </button>
-      `;
-    })
-    .join("");
-
   const cityList = groups
     .sort((a, b) => b.count - a.count || a.location.localeCompare(b.location))
     .map((group) => `
@@ -520,34 +610,18 @@ function renderPhotoMap() {
     `)
     .join("");
 
+  if (photoLeafletMap) {
+    photoLeafletMap.remove();
+    photoLeafletMap = null;
+    photoLeafletMarkers.clear();
+  }
+
   photoMapEl.innerHTML = `
-    <div class="photo-map-visual" aria-label="World photo map">
-      <svg class="photo-world-map-fallback" viewBox="0 0 1000 500" aria-hidden="true">
-        <path class="photo-map-fallback-land" d="M77 166L112 124L166 102L228 95L285 112L330 149L351 197L332 235L284 238L252 272L218 263L184 292L137 276L116 235L79 218L55 187Z"></path>
-        <path class="photo-map-fallback-land" d="M249 278L287 293L316 342L304 392L279 447L246 487L222 430L205 371L219 318Z"></path>
-        <path class="photo-map-fallback-land" d="M398 145L446 107L506 94L570 105L636 90L705 105L781 130L858 173L894 219L865 257L804 245L752 264L703 248L652 279L598 264L559 286L510 257L458 275L410 238L375 194Z"></path>
-        <path class="photo-map-fallback-land" d="M492 272L538 286L577 326L590 378L569 430L533 465L501 423L476 365L462 311Z"></path>
-        <path class="photo-map-fallback-land" d="M760 315L815 292L872 308L922 354L900 398L844 417L790 391Z"></path>
-        <path class="photo-map-fallback-land" d="M427 94L470 65L516 76L526 116L485 139L445 123Z"></path>
-        <path class="photo-map-fallback-land" d="M0 460L102 448L213 462L335 453L455 466L567 452L692 463L816 449L1000 464V500H0Z"></path>
-        <path class="photo-map-fallback-island" d="M802 211L814 202L824 214L816 228Z"></path>
-        <path class="photo-map-fallback-island" d="M835 232L846 242L838 257L824 247Z"></path>
-        <path class="photo-map-fallback-island" d="M454 150L468 144L475 160L461 168Z"></path>
-      </svg>
-      <img
-        class="photo-world-map"
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/BlankMap-Equirectangular.svg/1280px-BlankMap-Equirectangular.svg.png"
-        alt=""
-        aria-hidden="true"
-        onload="this.previousElementSibling.style.display='none';"
-        onerror="this.style.display='none';"
-      />
-      ${markerButtons}
-    </div>
+    <div id="photo-map-canvas" class="photo-map-visual" aria-label="사진 촬영 지역 지도"></div>
     <aside class="photo-map-panel">
-      <div class="photo-map-selected">
+      <div class="photo-map-selected" aria-live="polite">
         <span class="photo-map-selected-swatch" style="background:${selectedGroup?.color || "#111827"};"></span>
-        <div>
+        <div class="photo-map-selected-copy">
           <strong>${escapeHtml(selectedGroup?.location || "No location")}</strong>
           <span>${selectedGroup ? `${selectedGroup.count} photos · latest ${selectedGroup.latestShotAt}` : ""}</span>
         </div>
@@ -558,19 +632,131 @@ function renderPhotoMap() {
     </aside>
   `;
 
-  $$(".photo-map-marker, .photo-map-city").forEach((btn) => {
+  $$(".photo-map-city").forEach((btn) => {
     btn.addEventListener("click", () => {
-      selectedMapLocation = btn.dataset.location;
-      pendingMapFocusLocation = btn.dataset.location;
-      renderPhotoMap();
+      selectPhotoMapLocation(btn.dataset.location, groups, true);
     });
   });
+
+  initializePhotoLeafletMap(groups, selectedGroup, Boolean(pendingMapFocusLocation));
+  pendingMapFocusLocation = null;
+}
+
+function initializePhotoLeafletMap(groups, selectedGroup, focusSelected) {
+  const mapCanvas = $("#photo-map-canvas");
+  if (!mapCanvas) return;
+
+  if (typeof L === "undefined") {
+    mapCanvas.innerHTML = '<p class="photo-map-error">지도를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.</p>';
+    return;
+  }
+
+  photoLeafletMap = L.map(mapCanvas, {
+    minZoom: 2,
+    maxZoom: 18,
+    zoomSnap: 0.5,
+    worldCopyJump: true,
+    scrollWheelZoom: true,
+  });
+
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(photoLeafletMap);
+
+  groups.forEach((group) => {
+    const marker = L.circleMarker(group.coords, getPhotoMapMarkerStyle(group, group === selectedGroup))
+      .addTo(photoLeafletMap)
+      .bindTooltip(group.location.split(",")[0], {
+        direction: "top",
+        offset: [0, -8],
+      })
+      .bindPopup(createPhotoMapPopup(group), {
+        className: "photo-map-popup",
+        minWidth: 280,
+        maxWidth: 340,
+        closeButton: true,
+      });
+
+    marker.on("click", () => selectPhotoMapLocation(group.location, groups, false));
+    photoLeafletMarkers.set(group.location, marker);
+  });
+
+  photoLeafletMap.on("popupopen", handlePhotoMapPopupOpen);
+
+  if (focusSelected && selectedGroup) {
+    photoLeafletMap.setView(selectedGroup.coords, 7);
+  } else if (groups.length) {
+    photoLeafletMap.fitBounds(groups.map((group) => group.coords), {
+      padding: [32, 32],
+      maxZoom: 3,
+    });
+  } else {
+    photoLeafletMap.setView([20, 0], 2);
+  }
+
+  window.setTimeout(() => photoLeafletMap?.invalidateSize(), 0);
+}
+
+function getPhotoMapMarkerStyle(group, isSelected) {
+  return {
+    radius: isSelected ? 9 : Math.min(9, 6 + Math.log10(group.count + 1)),
+    color: "#ffffff",
+    weight: isSelected ? 3 : 2,
+    fillColor: group.color,
+    fillOpacity: isSelected ? 1 : 0.86,
+  };
+}
+
+function selectPhotoMapLocation(location, groups, focusMap) {
+  const selectedGroup = groups.find((group) => group.location === location);
+  if (!selectedGroup) return;
+
+  selectedMapLocation = location;
+
+  $$(".photo-map-city").forEach((button) => {
+    const isSelected = button.dataset.location === location;
+    button.classList.toggle("is-selected", isSelected);
+    if (isSelected && !focusMap) {
+      button.scrollIntoView({ block: "nearest" });
+    }
+  });
+
+  const selectedCard = $(".photo-map-selected");
+  if (selectedCard) {
+    selectedCard.innerHTML = `
+      <span class="photo-map-selected-swatch" style="background:${selectedGroup.color};"></span>
+      <div class="photo-map-selected-copy">
+        <strong>${escapeHtml(selectedGroup.location)}</strong>
+        <span>${selectedGroup.count} photos · latest ${selectedGroup.latestShotAt}</span>
+      </div>
+    `;
+  }
+
+  groups.forEach((group) => {
+    photoLeafletMarkers.get(group.location)?.setStyle(
+      getPhotoMapMarkerStyle(group, group.location === location)
+    );
+  });
+  photoLeafletMarkers.get(location)?.bringToFront();
+
+  if (focusMap && photoLeafletMap) {
+    photoLeafletMap.flyTo(selectedGroup.coords, Math.max(photoLeafletMap.getZoom(), 7), {
+      duration: 0.7,
+    });
+    window.setTimeout(() => {
+      if (photoMapModalEl?.classList.contains("is-open")) {
+        photoLeafletMarkers.get(location)?.openPopup();
+      }
+    }, 750);
+  }
 }
 
 function closePhotoMap() {
   if (!photoMapModalEl) return;
   photoMapModalEl.classList.remove("is-open");
   photoMapModalEl.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("photo-map-open");
   pendingMapFocusLocation = null;
   selectedMapLocation = null;
 }
@@ -578,8 +764,8 @@ function closePhotoMap() {
 if (photoModalEl) {
   photoModalEl.addEventListener("click", (e) => {
     const target = e.target;
-    if (target.matches("[data-close-modal]")) {
-      closePhotoModal();
+    if (target.closest("[data-close-modal]")) {
+      requestClosePhotoModal();
     }
   });
 
@@ -594,7 +780,7 @@ if (photoModalEl) {
     if (!photoModalEl.classList.contains("is-open")) return;
 
     if (e.key === "Escape") {
-      closePhotoModal();
+      requestClosePhotoModal();
     } else if (e.key === "ArrowLeft") {
       navigatePhoto(-1);
     } else if (e.key === "ArrowRight") {
@@ -617,11 +803,18 @@ if (photoMapModalEl) {
 
   document.addEventListener("keydown", (e) => {
     if (!photoMapModalEl.classList.contains("is-open")) return;
+    if (photoModalEl?.classList.contains("is-open")) return;
     if (e.key === "Escape") {
       closePhotoMap();
     }
   });
 }
+
+window.addEventListener("popstate", () => {
+  if (photoModalEl?.classList.contains("is-open") && photoModalReturnToMap) {
+    closePhotoModal();
+  }
+});
 
 // 초기 데이터 로딩
 window.addEventListener("DOMContentLoaded", () => {
