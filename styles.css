@@ -42,7 +42,7 @@ button {
 }
 
 .section {
-  padding: 16px 0;
+  padding: 28px 0;
 }
 
 .section-alt {
@@ -83,7 +83,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 5px 18px;
+  padding: 11px 18px;
 }
 
 .logo {
@@ -195,7 +195,7 @@ button {
 }
 
 .hero {
-  padding-top: 10px;
+  padding-top: 28px;
   padding-bottom: 8px;
 }
 
@@ -235,7 +235,7 @@ button {
   color: #4b5563;
   font-size: 16px;
   line-height: 1.55;
-  text-align: justify;
+  text-align: left;
   max-width: 100%;
   overflow-wrap: break-word;
 }
@@ -452,7 +452,7 @@ button {
 
 .about-duration {
   font-size: 14px;
-  color: #9ca3af;
+  color: #6b7280;
   font-weight: 400;
 }
 
@@ -584,7 +584,7 @@ button {
 }
 
 .work-title {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 400;
   margin: 0;
   color: #111827;
@@ -613,13 +613,13 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 22px;
-  padding: 3px 8px;
+  min-height: 30px;
+  padding: 5px 10px;
   border: 1px solid #d1d5db;
   border-radius: 999px;
   color: #374151;
   background: #ffffff;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1;
   font-weight: 500;
   transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
@@ -660,7 +660,7 @@ button {
   font-size: 30px;
   line-height: 1;
   font-weight: 300;
-  color: #e5e7eb;
+  color: #6b7280;
   letter-spacing: 0.04em;
 }
 
@@ -1262,7 +1262,7 @@ button {
   }
 
   .hero-profile {
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   .work-year-group {
