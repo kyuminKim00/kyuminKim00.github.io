@@ -1431,6 +1431,7 @@ button {
 
   .work-thumbnail {
     max-width: min(100%, 320px);
+    margin-inline: auto;
   }
 
   .work-year-group {
