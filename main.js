@@ -132,15 +132,13 @@ function renderWorkCards() {
     return;
   }
 
-  const groupedByYear = items.reduce((groups, item) => {
-    const year = item.year || "Other";
-    if (!groups.has(year)) groups.set(year, []);
-    groups.get(year).push(item);
-    return groups;
-  }, new Map());
+  const workTypes = ["publication", "patent", "project"];
+  const groupedByType = workTypes
+    .map((type) => [type, items.filter((item) => item.type === type)])
+    .filter(([, groupItems]) => groupItems.length);
 
-  workListEl.innerHTML = Array.from(groupedByYear.entries())
-    .map(([year, groupItems]) => {
+  workListEl.innerHTML = groupedByType
+    .map(([type, groupItems]) => {
       const works = groupItems
         .map((item) => {
           const thumbnailImage = item.thumbnail
@@ -184,9 +182,9 @@ function renderWorkCards() {
         .join("");
 
       return `
-        <section class="work-year-group">
-          <div class="work-year">${year}</div>
-          <div class="work-year-items">
+        <section class="work-type-group">
+          <h3 class="work-type-heading">${getWorkTypeLabel(type)}</h3>
+          <div class="work-type-items">
             ${works}
           </div>
         </section>
